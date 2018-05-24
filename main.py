@@ -1,3 +1,5 @@
+import time
+
 class Node:
     # initiliazing
     def __init__(self, id, x, y):
@@ -55,10 +57,12 @@ def greedy_algorithm(nodes):
 def opt2(nodes, solution):
     best = 0
     best_move = None
-    numberofnodes = len(nodes)
+    numberofnodes = len(solution)
 
     for first in range(0, numberofnodes):
+        # print("Loop")
         for second in range(0, numberofnodes):
+            # print("Inner Loop")
             third = (first + 1) % numberofnodes
             fourth = (second + 1) % numberofnodes
 
@@ -67,10 +71,17 @@ def opt2(nodes, solution):
             t3 = solution[third]
             f4 = solution[fourth]
 
+            '''
+            f1_s2 = dist_matrix[f1.id][s2.id]
+            t3_f4 = dist_matrix[t3.id][f4.id]
+            f1_t3 = dist_matrix[f1.id][t3.id]
+            s2_f4 = dist_matrix[s2.id][f4.id]
+            '''
             f1_s2 = compute_distance(f1, s2)
             t3_f4 = compute_distance(t3, f4)
             f1_t3 = compute_distance(f1, t3)
             s2_f4 = compute_distance(s2, f4)
+            # '''
 
             if second != first and second != third:
                 gain = (f1_s2 + t3_f4) - (f1_t3 + s2_f4)
@@ -78,6 +89,7 @@ def opt2(nodes, solution):
                     best_move = (first, third, second, fourth)
                     best = gain
 
+    # print("Inner Inner")
     if best_move is not None:
         (first, third, second, fourth) = best_move
         new_solution = [0 for x in range(numberofnodes)]
@@ -106,9 +118,62 @@ def do_opt2(nodes):
     greedy_sol, temp = greedy_algorithm(nodes)
     solution = greedy_sol
 
+    '''
+    distance_matrix = [[0] * len(nodes)] * len(nodes)
+    for i in range(0,len(nodes)):
+        for j in range(0,len(nodes)):
+            dist = compute_distance(nodes[i], nodes[j])
+            distance_matrix[i][j] = dist
+            distance_matrix[j][i] = dist
+    '''
+
     while control:
         control, solution = opt2(nodes, solution)
     return solution
+
+
+def do_opt2_part_by_part(nodes, scale):
+    control = True
+    greedy_sol, temp = greedy_algorithm(nodes)
+    solution = greedy_sol
+    # print("algoritm starts")
+    iteration_number = int(len(nodes) / scale)
+    opt2_solution = []
+
+    for i in range(0, iteration_number):
+        control = True
+        lower_bound = 0 + (i * scale)
+        upper_bound = scale + (i * scale)
+        n = 0
+        temp_sol = [0 for x in range(scale)]
+        for j in range(lower_bound, upper_bound):
+            temp_sol[n] = solution[j]
+            n = n + 1
+
+        while control:
+            control, temp_sol = opt2(nodes, temp_sol)
+
+        for k in range(0, scale):
+            opt2_solution.append(temp_sol[k])
+        # print("end of for")
+
+    if len(opt2_solution) != len(solution):
+        missing_points = len(solution) - len(opt2_solution)
+        temp_sol = [0 for x in range(missing_points)]
+        m = 0
+        control = True
+
+        for p in range(len(solution) - 1, len(solution) - (1 + missing_points), -1):
+            temp_sol[m] = solution[p]
+            m = m + 1
+
+        while control:
+            control, temp_sol = opt2(nodes, temp_sol)
+
+        for k in range(0, missing_points):
+            opt2_solution.append(temp_sol[k])
+
+    return opt2_solution
 
 
 fh = open('Texts\example-input-3.txt', 'r')
@@ -134,7 +199,7 @@ while rec != "":
                 temp1 = i + 1
     rec = fh.readline().rstrip("\n")
     nodes.append(temp)
-
+'''
 greedy_sol, greedy_total = greedy_algorithm(nodes)
 
 file = open('Texts\greedy_solution1.txt', 'w')
@@ -142,17 +207,38 @@ file.write(str(greedy_total) + "\n")
 
 for i in range(0, len(greedy_sol)):
     file.write(str(greedy_sol[i].id) + "\n")
+'''
 
+start = time.time()
 
-opt2_sol = do_opt2(nodes)
+if len(nodes) >= 1001:
+    opt2_sol = do_opt2_part_by_part(nodes, 2000)
 
-opt2_total = 0
-for j in range(0, len(opt2_sol) - 1):
-    opt2_total = opt2_total + compute_distance(opt2_sol[j], opt2_sol[j + 1])
-opt2_total = opt2_total + compute_distance(opt2_sol[len(opt2_sol)-1], opt2_sol[0])
+    opt2_total = 0
+    for j in range(0, len(opt2_sol) - 1):
+        opt2_total = opt2_total + compute_distance(opt2_sol[j], opt2_sol[j + 1])
+    opt2_total = opt2_total + compute_distance(opt2_sol[len(opt2_sol) - 1], opt2_sol[0])
 
-file = open('Texts\opt2_solution1.txt', 'w')
-file.write(str(opt2_total) + "\n")
+    file = open('Texts\opt2_solution3_2000.txt', 'w')
+    file.write(str(opt2_total) + "\n")
 
-for i in range(0, len(greedy_sol)):
-    file.write(str(opt2_sol[i].id) + "\n")
+    for i in range(0, len(opt2_sol)):
+        file.write(str(opt2_sol[i].id) + "\n")
+else:
+    opt2_sol = do_opt2(nodes)
+
+    opt2_total = 0
+    for j in range(0, len(opt2_sol) - 1):
+        opt2_total = opt2_total + compute_distance(opt2_sol[j], opt2_sol[j + 1])
+    opt2_total = opt2_total + compute_distance(opt2_sol[len(opt2_sol) - 1], opt2_sol[0])
+
+    file = open('Texts\opt2_solution3.txt', 'w')
+    file.write(str(opt2_total) + "\n")
+
+    for i in range(0, len(opt2_sol)):
+        file.write(str(opt2_sol[i].id) + "\n")
+
+end = time.time()
+
+print("Execution Time = ", end="")
+print(end - start)
