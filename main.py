@@ -1,5 +1,6 @@
 import time
 
+
 class Node:
     # initiliazing
     def __init__(self, id, x, y):
@@ -71,17 +72,10 @@ def opt2(nodes, solution):
             t3 = solution[third]
             f4 = solution[fourth]
 
-            '''
-            f1_s2 = dist_matrix[f1.id][s2.id]
-            t3_f4 = dist_matrix[t3.id][f4.id]
-            f1_t3 = dist_matrix[f1.id][t3.id]
-            s2_f4 = dist_matrix[s2.id][f4.id]
-            '''
             f1_s2 = compute_distance(f1, s2)
             t3_f4 = compute_distance(t3, f4)
             f1_t3 = compute_distance(f1, t3)
             s2_f4 = compute_distance(s2, f4)
-            # '''
 
             if second != first and second != third:
                 gain = (f1_s2 + t3_f4) - (f1_t3 + s2_f4)
@@ -117,15 +111,6 @@ def do_opt2(nodes):
     control = True
     greedy_sol, temp = greedy_algorithm(nodes)
     solution = greedy_sol
-
-    '''
-    distance_matrix = [[0] * len(nodes)] * len(nodes)
-    for i in range(0,len(nodes)):
-        for j in range(0,len(nodes)):
-            dist = compute_distance(nodes[i], nodes[j])
-            distance_matrix[i][j] = dist
-            distance_matrix[j][i] = dist
-    '''
 
     while control:
         control, solution = opt2(nodes, solution)
@@ -176,7 +161,11 @@ def do_opt2_part_by_part(nodes, scale):
     return opt2_solution
 
 
-fh = open('Texts\example-input-3.txt', 'r')
+file_name = "test-input-3.txt"
+result_name = "test3-scale1000.txt"
+scale = 1000
+
+fh = open(file_name, 'r')
 rec = fh.readline().rstrip("\n")
 temp = 0
 nodes = []
@@ -199,27 +188,18 @@ while rec != "":
                 temp1 = i + 1
     rec = fh.readline().rstrip("\n")
     nodes.append(temp)
-'''
-greedy_sol, greedy_total = greedy_algorithm(nodes)
-
-file = open('Texts\greedy_solution1.txt', 'w')
-file.write(str(greedy_total) + "\n")
-
-for i in range(0, len(greedy_sol)):
-    file.write(str(greedy_sol[i].id) + "\n")
-'''
 
 start = time.time()
 
-if len(nodes) >= 1001:
-    opt2_sol = do_opt2_part_by_part(nodes, 2000)
+if len(nodes) >= 1005:
+    opt2_sol = do_opt2_part_by_part(nodes, scale)
 
     opt2_total = 0
     for j in range(0, len(opt2_sol) - 1):
         opt2_total = opt2_total + compute_distance(opt2_sol[j], opt2_sol[j + 1])
     opt2_total = opt2_total + compute_distance(opt2_sol[len(opt2_sol) - 1], opt2_sol[0])
 
-    file = open('Texts\opt2_solution3_2000.txt', 'w')
+    file = open(result_name, 'w')
     file.write(str(opt2_total) + "\n")
 
     for i in range(0, len(opt2_sol)):
@@ -232,7 +212,7 @@ else:
         opt2_total = opt2_total + compute_distance(opt2_sol[j], opt2_sol[j + 1])
     opt2_total = opt2_total + compute_distance(opt2_sol[len(opt2_sol) - 1], opt2_sol[0])
 
-    file = open('Texts\opt2_solution3.txt', 'w')
+    file = open(result_name, 'w')
     file.write(str(opt2_total) + "\n")
 
     for i in range(0, len(opt2_sol)):
