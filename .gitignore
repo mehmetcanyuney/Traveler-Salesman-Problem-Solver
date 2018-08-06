@@ -1,5 +1,2 @@
 # ignore
-*.txt
-Deneme\*
-Deneme/*
-!Deneme
+Deneme/*txt
