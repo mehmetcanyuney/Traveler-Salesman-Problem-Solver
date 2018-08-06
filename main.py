@@ -1,6 +1,7 @@
 import time
 
 
+# basic data structure for a node
 class Node:
     # initiliazing
     def __init__(self, id, x, y):
@@ -23,6 +24,7 @@ class Node:
         return result
 
 
+# calculating distance between two node : Euclidian distance
 def compute_distance(node1, node2):
     dist_x = pow((node1.x - node2.x), 2)
     dist_y = pow((node1.y - node2.y), 2)
@@ -30,6 +32,7 @@ def compute_distance(node1, node2):
     return result
 
 
+# greedy algorithm for calculating minimum tour for TSP
 def greedy_algorithm(nodes):
     solution = []
     free_nodes = nodes[:]
@@ -55,15 +58,14 @@ def greedy_algorithm(nodes):
     return solution, total_travel
 
 
+# basic 2-opt algorithm
 def opt2(nodes, solution):
     best = 0
     best_move = None
     numberofnodes = len(solution)
 
     for first in range(0, numberofnodes):
-        # print("Loop")
         for second in range(0, numberofnodes):
-            # print("Inner Loop")
             third = (first + 1) % numberofnodes
             fourth = (second + 1) % numberofnodes
 
@@ -83,7 +85,6 @@ def opt2(nodes, solution):
                     best_move = (first, third, second, fourth)
                     best = gain
 
-    # print("Inner Inner")
     if best_move is not None:
         (first, third, second, fourth) = best_move
         new_solution = [0 for x in range(numberofnodes)]
@@ -107,6 +108,7 @@ def opt2(nodes, solution):
         return False, solution
 
 
+# doing 2opt algorithm for every node in nodes list
 def do_opt2(nodes):
     control = True
     greedy_sol, temp = greedy_algorithm(nodes)
@@ -117,11 +119,11 @@ def do_opt2(nodes):
     return solution
 
 
+# doing 2opt algorithm part by part in nodes list
 def do_opt2_part_by_part(nodes, scale):
     control = True
     greedy_sol, temp = greedy_algorithm(nodes)
     solution = greedy_sol
-    # print("algoritm starts")
     iteration_number = int(len(nodes) / scale)
     opt2_solution = []
 
@@ -140,7 +142,6 @@ def do_opt2_part_by_part(nodes, scale):
 
         for k in range(0, scale):
             opt2_solution.append(temp_sol[k])
-        # print("end of for")
 
     if len(opt2_solution) != len(solution):
         missing_points = len(solution) - len(opt2_solution)
@@ -161,6 +162,7 @@ def do_opt2_part_by_part(nodes, scale):
     return opt2_solution
 
 
+# reading the input file and creating node list
 file_name = "test-input-3.txt"
 result_name = "test3-scale1000.txt"
 scale = 1000
