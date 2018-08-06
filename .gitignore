@@ -2,3 +2,4 @@
 *.txt
 Deneme\*
 Deneme/*
+!Deneme
